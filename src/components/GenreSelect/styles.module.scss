@@ -1,0 +1,14 @@
+.formControl {
+  margin: 8px !important;
+  min-width: 120px !important;
+  max-width: 300px !important;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.chip {
+  margin: 2px;
+}
