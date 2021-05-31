@@ -1,76 +1,64 @@
 import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Pagination from '@material-ui/lab/Pagination';
 
 import GenreSelect from '../GenreSelect';
 import MoviesList from '../MoviesList';
 import Spinner from '../Spinner';
-import MovieAPIClient from '../../lib/MovieAPIClient';
-import { prepareMovies } from '../../lib/utils';
+import { 
+	fetchMovies,
+	changePage,
+	selectGenres
+} from '../../actions/actionCreators';
 
 import styles from './styles.module.scss';
 
-const MoviesListSection = props => {
-	const [state, setState] = useState({
-		movies: [],
-		totalPages: 0,
-		currentPage: 1,
-		isLoading: true,
-		selectedGenres: [],
-		selectedGenreIDs: [],
-	});
+const mapStateToProps = state => ({
+  genres: state.genres,
+  movies: state.movies,
+	totalPages: state.totalPages,
+	isLoading: state.isLoading,
+	currentPage: state.currentPage,
+	selectedGenres: state.selectedGenres,
+	selectedGenreIDs: state.selectedGenreIDs,
+});
 
+const mapDispatchToProps = dispatch => ({
+	fetchMovies: (page, genreIDs) => dispatch(fetchMovies(page, genreIDs)),
+	changePage: page => dispatch(changePage(page)),
+	selectGenres: genres => dispatch(selectGenres(genres)),
+});
+
+const MoviesListSection = props => {
 	useEffect(() => {
-		MovieAPIClient.getMovies(state.currentPage, state.selectedGenreIDs)
-			.then(response => {
-				const movies = prepareMovies(response.data.results, props.genres);
-				setState({
-					...state,
-					movies,
-					isLoading: false,
-					totalPages: response.data.total_pages,
-				})
-			})
-	}, [state.currentPage, state.selectedGenres]);
+		props.fetchMovies(props.currentPage, props.selectedGenreIDs);
+	}, [props.currentPage, props.selectedGenres]);
 
 	const handlePageClick = (event, page) => {
 		window.scrollTo(0, 0);
-
-		setState({
-			...state,
-			isLoading: true,
-			currentPage: page
-		});
+		props.changePage(page);
 	};
 
 	const handleSelectClick = (event) => {
-		const selectedGenreIDs = event.target.value.map(genre => genre.id).join();
-
-		setState({
-			...state,
-			isLoading: true,
-			currentPage: 1,
-			selectedGenreIDs,
-			selectedGenres: event.target.value,
-		});
+		props.changePage(1);
+		props.selectGenres(event.target.value);
 	};
 
-	if (state.isLoading) {
+	if (props.isLoading) {
 		return <Spinner />;
 	}
-
+  
 	return (
 		<section className={styles.section}>
 			<GenreSelect
-				genres={props.genres}
-				selectedGenres={state.selectedGenres}
 				onSelect={handleSelectClick}
 			/>
-			{state.movies.length > 0 && <MoviesList movies={state.movies} />}
-			{state.totalPages > 0 &&
+			{props.movies.length > 0 && <MoviesList />}
+			{props.totalPages > 0 &&
 				<Pagination
-					count={state.totalPages}
-					page={state.currentPage}
+					count={props.totalPages}
+					page={props.currentPage}
 					onChange={handlePageClick}
 				/>
 			}
@@ -87,4 +75,4 @@ MoviesListSection.propTypes = {
 	),
 };
 
-export default MoviesListSection;
+export default connect(mapStateToProps, mapDispatchToProps)(MoviesListSection);

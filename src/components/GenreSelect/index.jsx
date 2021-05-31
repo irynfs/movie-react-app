@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -19,6 +20,11 @@ const MenuProps = {
 		},
 	},
 };
+
+const mapStateToProps = state => ({
+  genres: state.genres,
+	selectedGenres: state.selectedGenres
+});
 
 const GenreSelect = props => {
 	const { genres, selectedGenres, onSelect } = props;
@@ -70,4 +76,4 @@ GenreSelect.propTypes = {
 	onSelect: PropTypes.func,
 };
 
-export default GenreSelect;
+export default connect(mapStateToProps)(GenreSelect);
