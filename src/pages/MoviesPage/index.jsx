@@ -1,27 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { connect } from 'react-redux';
 
 import Title from '../../components/Title';
 import MoviesListSection from '../../components/MoviesListSection';
-import MovieAPIClient from '../../lib/MovieAPIClient';
+import { fetchGenres } from '../../actions/actionCreators';
 
-const MoviesPage = () => {
-  const [genres, setGenres] = useState([]);
+const mapStateToProps = state => ({
+  genres: state.genres
+});
+
+const mapDispatchToProps = dispatch => ({
+  fetchGenres: () => dispatch(fetchGenres())
+});
+
+const MoviesPage = props => {
   useEffect(() => {
-    MovieAPIClient.getGenres()
-      .then(response => setGenres(response.data.genres));
+    props.fetchGenres();
   }, []);
 
   return (
     <>
       <Title />
 
-      {genres.length > 0 &&
-        <MoviesListSection
-          genres={genres}
-        />
+      {props.genres.length > 0 &&
+        <MoviesListSection />
       }
     </>
   );
 }
 
-export default MoviesPage;
+export default connect(mapStateToProps, mapDispatchToProps)(MoviesPage);

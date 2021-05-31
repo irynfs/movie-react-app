@@ -7,16 +7,14 @@ import Typography from '@material-ui/core/Typography';
 import styles from './styles.module.scss';
 
 const MovieItem = props => {
-	const {
-		movie: { title, poster, releaseDate, genres }
-	} = props;
+	const { movie: { title, poster, releaseDate, genres } } = props;
 
 	return (
 		<Paper className={styles.paper}>
 			<Avatar
 				className={styles.avatar}
 				alt={poster}
-				src={`https://image.tmdb.org/t/p/w500${poster}`}
+				src={poster && `https://image.tmdb.org/t/p/w500${poster}`}
 			/>
 			<div className={styles.movieInfo}>
 				<Typography variant="subtitle1" style={{ fontWeight: 'bold' }}>
